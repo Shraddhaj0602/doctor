@@ -1,0 +1,360 @@
+exp3codes
+Calculator.idl
+module CalculatorApp {
+    interface Calculator {
+        float add(in float a, in float b);
+        float sub(in float a, in float b);
+        float mul(in float a, in float b);
+        float div(in float a, in float b);
+    };
+};
+
+CalculatorApp/CalculatorImpl.java
+
+package CalculatorApp;
+import org.omg.CORBA.*;
+
+public class CalculatorImpl extends CalculatorPOA {
+    public float add(float a, float b) { return a + b; }
+    public float sub(float a, float b) { return a - b; }
+    public float mul(float a, float b) { return a * b; }
+    public float div(float a, float b) { return a / b; }
+}
+
+CalculatorApp/Server.java
+
+package CalculatorApp;
+
+import org.omg.CORBA.*;
+import org.omg.PortableServer.*;
+import org.omg.CosNaming.*;
+
+public class Server {
+    public static void main(String args[]) {
+        try {
+            ORB orb = ORB.init(args, null);
+            POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+            rootpoa.the_POAManager().activate();
+
+            // Create and register Calculator service
+            CalculatorImpl calcImpl = new CalculatorImpl();
+            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(calcImpl);
+            Calculator calcRef = CalculatorHelper.narrow(ref);
+
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            ncRef.rebind(ncRef.to_name("CalculatorService"), calcRef);
+
+            System.out.println("✅ Calculator service registered successfully.");
+            orb.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+CalculatorApp/Client1.java
+
+package CalculatorApp;
+
+import org.omg.CORBA.*;
+import org.omg.CosNaming.*;
+
+public class Client1 {
+    public static void main(String args[]) {
+        try {
+            ORB orb = ORB.init(args, null);
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            Calculator calc = CalculatorHelper.narrow(ncRef.resolve_str("CalculatorService"));
+
+            System.out.println("Addition (10 + 5): " + calc.add(10, 5));
+            System.out.println("Subtraction (10 - 5): " + calc.sub(10, 5));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+CalculatorApp/Client2.java
+
+package CalculatorApp;
+
+import org.omg.CORBA.*;
+import org.omg.CosNaming.*;
+
+public class Client2 {
+    public static void main(String args[]) {
+        try {
+            ORB orb = ORB.init(args, null);
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            Calculator calc = CalculatorHelper.narrow(ncRef.resolve_str("CalculatorService"));
+
+            System.out.println("Multiplication (6 * 4): " + calc.mul(6, 4));
+            System.out.println("Division (20 / 4): " + calc.div(20, 4));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+String.idl
+
+module StringApp {
+    interface StringOps {
+        string reverse(in string input);
+        string toUpper(in string input);
+    };
+};
+
+
+StringApp/StringImpl.java
+
+package StringApp;
+import org.omg.CORBA.*;
+
+public class StringImpl extends StringOpsPOA {
+    public String reverse(String input) {
+        return new StringBuilder(input).reverse().toString();
+    }
+    public String toUpper(String input) {
+        return input.toUpperCase();
+    }
+}
+
+
+StringApp/Server.java
+
+package StringApp;
+
+import org.omg.CORBA.*;
+import org.omg.PortableServer.*;
+import org.omg.CosNaming.*;
+
+public class Server {
+    public static void main(String args[]) {
+        try {
+            ORB orb = ORB.init(args, null);
+            POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+            rootpoa.the_POAManager().activate();
+
+            // Create & register String service
+            StringImpl strImpl = new StringImpl();
+            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(strImpl);
+            StringOps strRef = StringOpsHelper.narrow(ref);
+
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            ncRef.rebind(ncRef.to_name("StringService"), strRef);
+
+            System.out.println("✅ String service registered successfully.");
+            orb.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+StringApp/Client1.java
+
+package StringApp;
+
+import org.omg.CORBA.*;
+import org.omg.CosNaming.*;
+
+public class Client1 {
+    public static void main(String args[]) {
+        try {
+            ORB orb = ORB.init(args, null);
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            StringOps str = StringOpsHelper.narrow(ncRef.resolve_str("StringService"));
+
+            System.out.println("Reverse: " + str.reverse("Distributed"));
+            System.out.println("Upper: " + str.toUpper("computing"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+StringApp/Client2.java
+
+
+package StringApp;
+
+import org.omg.CORBA.*;
+import org.omg.CosNaming.*;
+
+public class Client2 {
+    public static void main(String args[]) {
+        try {
+            ORB orb = ORB.init(args, null);
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            StringOps str = StringOpsHelper.narrow(ncRef.resolve_str("StringService"));
+
+            System.out.println("Reverse: " + str.reverse("CORBA"));
+            System.out.println("Upper: " + str.toUpper("middleware"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+Factorial.idl
+
+module FactorialApp {
+    interface Factorial {
+        long compute(in long n);
+    };
+};
+
+
+FactorialApp/FactorialImpl.java
+
+package FactorialApp;
+import org.omg.CORBA.*;
+
+public class FactorialImpl extends FactorialPOA {
+    public long compute(long n) {
+        if (n <= 1) return 1;
+        return n * compute(n - 1);
+    }
+}
+
+/* NOTE: 
+If after running idlj, the generated file FactorialOperations.java shows:
+  int compute(int n);
+then change your implementation to use int instead of long:
+
+package FactorialApp;
+import org.omg.CORBA.*;
+public class FactorialImpl extends FactorialPOA {
+    public int compute(int n) {
+        if (n <= 1) return 1;
+        return n * compute(n - 1);
+    }
+}
+*/
+
+package FactorialApp;
+import org.omg.CORBA.*;
+
+public class FactorialImpl extends FactorialPOA {
+    public long compute(long n) {
+        if (n <= 1) return 1;
+        return n * compute(n - 1);
+    }
+}
+
+/* NOTE: 
+If after running idlj, the generated file FactorialOperations.java shows:
+  int compute(int n);
+then change your implementation to use int instead of long:
+
+package FactorialApp;
+import org.omg.CORBA.*;
+public class FactorialImpl extends FactorialPOA {
+    public int compute(int n) {
+        if (n <= 1) return 1;
+        return n * compute(n - 1);
+    }
+}
+*/
+
+
+FactorialApp/Server.java
+
+package FactorialApp;
+
+import org.omg.CORBA.*;
+import org.omg.PortableServer.*;
+import org.omg.CosNaming.*;
+
+public class Server {
+    public static void main(String args[]) {
+        try {
+            ORB orb = ORB.init(args, null);
+            POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+            rootpoa.the_POAManager().activate();
+
+            // Create and register Factorial service
+            FactorialImpl factImpl = new FactorialImpl();
+            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(factImpl);
+            Factorial factRef = FactorialHelper.narrow(ref);
+
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            ncRef.rebind(ncRef.to_name("FactorialService"), factRef);
+
+            System.out.println("✅ Factorial service registered successfully.");
+            orb.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+FactorialApp/Client1.java
+
+package FactorialApp;
+
+import org.omg.CORBA.*;
+import org.omg.PortableServer.*;
+import org.omg.CosNaming.*;
+
+public class Server {
+    public static void main(String args[]) {
+        try {
+            ORB orb = ORB.init(args, null);
+            POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+            rootpoa.the_POAManager().activate();
+
+            // Create and register Factorial service
+            FactorialImpl factImpl = new FactorialImpl();
+            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(factImpl);
+            Factorial factRef = FactorialHelper.narrow(ref);
+
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            ncRef.rebind(ncRef.to_name("FactorialService"), factRef);
+
+            System.out.println("✅ Factorial service registered successfully.");
+            orb.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+FactorialApp/Client2.java
+
+import org.omg.CORBA.*;
+import org.omg.CosNaming.*;
+
+public class Client2 {
+    public static void main(String args[]) {
+        try {
+            ORB orb = ORB.init(args, null);
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            Factorial fact = FactorialHelper.narrow(ncRef.resolve_str("FactorialService"));
+
+            System.out.println("Factorial(3): " + fact.compute(3));
+            System.out.println("Factorial(10): " + fact.compute(10));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
