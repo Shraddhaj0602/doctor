@@ -1,0 +1,84 @@
+mapreduce.py
+
+import sys
+from collections import defaultdict
+import re
+
+
+def mapper(document):
+  
+    text = document.lower()
+    text = re.sub(r'[^\w\s]', '', text)  
+    words = text.split()
+    for word in words:
+        if word:
+            yield (word, 1)
+
+
+def reducer(key, values):
+  
+    total = sum(values)
+    yield (key, total)
+
+
+if name == 'main':
+    print("=== MapReduce Word Count (User Input Mode) ===\n")
+    print("Enter your text below (one line at a time).")
+    print("Type 'END' on a new line when finished.\n")
+
+    documents = []
+    print("Enter text:")
+    while True:
+        line = input()
+        if line.strip().upper() == 'END':
+            break
+        documents.append(line)
+
+    if not documents:
+        print("\nNo input provided. Exiting.")
+        sys.exit(0)
+
+    print("\n" + "="*50)
+    print("--- Input Documents ---")
+    for i, doc in enumerate(documents, 1):
+        print(f"{i}: {doc}")
+    print("="*50 + "\n")
+
+
+    print("--- 1. Map Phase ---")
+    mapped_pairs = []
+    for doc in documents:
+        for word, count in mapper(doc):
+            mapped_pairs.append((word, count))
+            print(f"  → ('{word}', {count})")
+
+    print("\n" + "="*50 + "\n")
+
+
+    print("--- 2. Shuffle & Sort Phase (Grouping) ---")
+    shuffled_data = defaultdict(list)
+    for key, value in mapped_pairs:
+        shuffled_data[key].append(value)
+
+    for key in sorted(shuffled_data.keys()):
+        print(f"  Grouped: ('{key}', {shuffled_data[key]})")
+
+    print("\n" + "="*50 + "\n")
+
+  
+    print("--- 3. Reduce Phase ---")
+    final_counts = {}
+    for key in sorted(shuffled_data.keys()):
+        for result_key, result_value in reducer(key, shuffled_data[key]):
+            final_counts[result_key] = result_value
+            print(f"  → ('{result_key}', {result_value})")
+
+    print("\n" + "="*50 + "\n")
+
+    print("--- Final Word Count Results ---")
+    sorted_results = sorted(final_counts.items(), key=lambda x: x[1], reverse=True)
+    for word, count in sorted_results:
+        print(f"{word:<20} {count}")
+
+    print("\n" + "="*50)
+    print("MapReduce Job Completed!")
