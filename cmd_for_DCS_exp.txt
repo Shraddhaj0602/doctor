@@ -1,0 +1,52 @@
+Experiment-1and2
+1)
+Terminal-1
+javac EchoServer.java
+java EchoServer
+
+Terminal-2
+javac EchoClient.java
+java EchoClient
+
+2)
+Terminal-1
+javac javac *.java
+ java Server
+
+
+Terminal-2
+java Client
+
+Experiment-3
+//cmd to run corba
+
+//Terminal-1 (For Corba to start ORB)
+
+PS D:\College_doc\Semister\Semister-7\DCS\Experiment-3\src> & "C:\Users\HP\.jdks\corretto-1.8.0_462\bin\tnameserv.exe" -ORBInitialPort 1051
+
+//Terminal-2 (For Server )
+1) Compile all files
+PS D:\College_doc\Semister\Semister-7\DCS\Experiment-3\src> & "C:\Users\HP\.jdks\corretto-1.8.0_462\bin\java.exe" -d ..\HelloApp ..\HelloApp\*.java HelloImpl.java HelloServer.java HelloClient.java
+
+2) Start server
+PS D:\College_doc\Semister\Semister-7\DCS\Experiment-3\src> & "C:\Users\HP\.jdks\corretto-1.8.0_462\bin\java.exe" -cp ".;..\HelloApp" HelloServer -ORBInitialPort 1051 -ORBInitialHost 127.0.0.1
+
+//Terminal-3 (For Client)
+PS D:\College_doc\Semister\Semister-7\DCS\Experiment-3\src> & "C:\Users\HP\.jdks\corretto-1.8.0_462\bin\javac.exe" -cp ".;..\HelloApp" HelloClient -ORBInitialPort 1051 -ORBInitialHost 127.0.0.1
+
+Experiment-4
+1)
+
+
+javac Berkeley.java
+java Berkeley
+
+
+Experiment-5
+
+Terminal-1
+
+javac Election.java
+java Election
+
+
